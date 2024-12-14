@@ -1,0 +1,7 @@
+.slick-slide {
+    padding: 0 15px; /* Điều chỉnh padding giữa các slide */
+}
+.slick-track {
+    display: flex;
+    gap: 15px; /* Nếu muốn dùng gap để tạo khoảng cách */
+}

@@ -1,0 +1,95 @@
+
+.text-li-custom {
+    position: relative;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.text-li-custom a {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s ease;
+}
+
+.text-li-custom a:hover {
+    color: #fbbf24; 
+}
+
+.text-li-custom a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: #fbbf24; /* Vàng */
+    animation: none;
+    transition: color 0.3s ease;
+}
+
+.text-li-custom a:hover::after {
+    animation: underlineExpand 0.4s forwards ease-out;
+}
+/* Keyframes cho hiệu ứng */
+@keyframes underlineExpand {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+/* custom btn */
+
+.btn-text-custom{
+    font-size: 14px;
+    font-weight: bold;
+    color: #2C2C2C;
+    padding: 13px 15px; 
+}
+
+.btn-text-custom:focus {
+    outline: none;
+}
+
+.btn-text-custom:focus-visible{
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.btn-text-custom-gray{
+    font-size: 14px;
+    font-weight: bold;
+    color: #2C2C2C;
+    padding: 13px 15px; 
+    border: solid 1px gray;
+}
+
+.btn-text-custom:hover {
+    color: #2C2C2C;
+    background: #FAFAFA;
+    border: solid 1px #FAFAFA;
+}
+
+.image-logo{
+    width: '120px';
+    height: 'auto';
+    object-fit: 'cover'
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; 
+    height: 97px;
+}
+.nav-link{
+    text-decoration: none !important;
+}
+
+

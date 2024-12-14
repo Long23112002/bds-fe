@@ -1,0 +1,22 @@
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    cursor: pointer;
+    transform: translateY(-5px);
+}
+
+.card img {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.card:hover img {
+    cursor: pointer;
+    opacity: 0.9;
+    transform: scale(1.05);
+}
+
+
+
+
