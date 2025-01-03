@@ -1,50 +1,58 @@
-# React + TypeScript + Vite
+# Bất Động Sản
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Giới Thiệu
+Dự án Bất Động Sản là một ứng dụng web giúp người dùng tìm kiếm, quản lý và đăng tin bán/thuê bất động sản. Ứng dụng được phát triển bằng [Vite](https://vitejs.dev/) kết hợp với [React](https://react.dev/) và [TypeScript](https://www.typescriptlang.org/).
 
-Currently, two official plugins are available:
+Giao diện được thiết kế và xây dựng sử dụng [Ant Design](https://ant.design/) và [Bootstrap](https://getbootstrap.com/) nhằm mang lại trải nghiệm tốt nhất cho người dùng.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tính Năng
+- Tìm kiếm bất động sản theo địa điểm, loại hình, giá cả.
+- Hiển thị danh sách và chi tiết tin đăng.
+- Đăng nhập/đăng ký tài khoản.
+- Đăng tin bán/thuê bất động sản.
+- Quản lý tin đăng cá nhân.
 
-## Expanding the ESLint configuration
+## Công Nghệ Sử Dụng
+### Frontend
+- **Vite**: Công cụ build nhanh và tối ưu.
+- **React**: Thư viện UI linh hoạt.
+- **TypeScript**: Cung cấp kiểm tra kiểu tĩnh.
+- **Ant Design**: Thư viện giao diện UI cao cấp.
+- **Bootstrap**: Framework CSS linh hoạt và dễ dàng tùy biến.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Backend
+Phần backend không được bao gồm trong README này, tuy nhiên, bạn có thể tích hợp với bất kỳ backend REST API nào.
 
-- Configure the top-level `parserOptions` property like this:
+## Cài Đặt
+1. Clone repository:
+   ```bash
+   git clone https://github.com/your-repo/real-estate.git
+   cd real-estate
+   ```
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+2. Cài đặt dependencies:
+   ```bash
+   npm install
+   ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+3. Chạy ứng dụng:
+   ```bash
+   npm run dev
+   ```
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+4. Mở trình duyệt để truy cập ứng dụng:
+   ```
+   http://localhost:5173
+   ```
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## Hướng Dẫn Sử Dụng
+- **Tìm kiếm**: Nhập từ khoá, chọn loại hình và địa điểm.
+- **Đăng tin**: Nhập thông tin bất động sản và tải ảnh.
+- **Quản lý**: Xem, sửa hoặc xoá tin đăng trong trang cá nhân.
+
+## Góp Ý Kiến
+Mọi góp ý kiến hoặc báo lỗi, vui lòng tạo issue tại [GitHub Issues](https://github.com/your-repo/real-estate/issues).
+
+## Giấy Phép
+Dự án được phát hành theo giấy phép MIT. Xem tài liệu [LICENSE](LICENSE) để biết thêm chi tiết.
+
