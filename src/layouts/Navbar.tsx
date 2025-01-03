@@ -3,8 +3,12 @@ import { observer } from 'mobx-react-lite';
 import '../layouts/styles/navbar-style.css';
 import { authStore } from '../stores/AuthStore';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import UserDropdown from './UserDropdown';
 
 const Navbar = () => {
+
+    const { authData } = useAuth();
 
     const handelOpenModalLogin = () => {
         authStore.setIsOpenLoginModal(true)
@@ -61,9 +65,14 @@ const Navbar = () => {
                             </li>
                         </ul>
                         <div className="d-flex" style={{ gap: '20px' }}>
-                            <button onClick={handelOpenModalLogin} className="btn btn-outline-white btn-text-custom">Đăng nhập</button>
-                            <span style={{ margin: '10px' }}>|</span>
-                            <button onClick={handelOpenModalRegister}  className="btn btn-outline-white btn-text-custom">Đăng kí</button>
+                            {authData ? (
+                                <UserDropdown name={authData.fullName || ''} avatar={authData.avatar || ''}  />
+                            ) : (
+                                <div className="d-flex" style={{ gap: '20px' }}>
+                                    <button className="btn btn-outline-primary btn-text-custom" onClick={handelOpenModalLogin}>Đăng nhập</button>
+                                    <button className="btn btn-primary btn-custom" onClick={handelOpenModalRegister}>Đăng ký</button>
+                                </div>
+                            )}
                             <Link to='/post-new'>
                               <button className="btn btn-outline-white btn-text-custom">Đăng tin</button>
                             </Link>

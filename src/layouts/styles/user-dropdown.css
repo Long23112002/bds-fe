@@ -1,0 +1,12 @@
+w-250 {
+    min-width: 250px;
+}
+
+.bg-pink-100 {
+    background-color: #fce7e7;
+    color: #d4380d;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}

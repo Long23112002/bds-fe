@@ -8,8 +8,8 @@ export default function NewsTabsLayout() {
 
   React.useEffect(() => {
     setTimeout(() => {
-      setLoading(false); 
-    }, 3000);
+      setLoading(false);
+    }, 500);
   }, []);
 
   return (

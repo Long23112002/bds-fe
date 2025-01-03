@@ -8,10 +8,12 @@ import { authStore } from '../../stores/AuthStore';
 const LoginModal: React.FC = () => {
     const [form] = Form.useForm();
 
-    const handleOk = () => {
-        form.validateFields().then((values) => {
-            console.log('Form values:', values);
-            authStore.setIsOpenLoginModal(false);
+    const handleOk = async () => {
+        form.validateFields().then(async (values) => {
+            await authStore.loginUser(values);
+            const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
+            localStorage.removeItem("redirectAfterLogin");
+            window.location.href = redirectPath;
         }).catch((errorInfo) => {
             console.log('Validation failed:', errorInfo);
         });
@@ -53,7 +55,7 @@ const LoginModal: React.FC = () => {
 
                     <Form form={form} layout="vertical">
                         <Form.Item
-                            name="username"
+                            name="phoneNumber"
                             rules={[{ required: true, message: 'Vui lòng nhập số điện thoại hoặc email!' }]}
                         >
                             <Input prefix={<UserOutlined />} placeholder="SĐT chính hoặc email" size="large" />
@@ -76,7 +78,7 @@ const LoginModal: React.FC = () => {
                         </Form.Item>
 
                         <Form.Item>
-                            <button  type="submit" className=" btn btn-danger w-100"  onClick={handleOk}>
+                            <button type="submit" className=" btn btn-danger w-100" onClick={handleOk}>
                                 Đăng nhập
                             </button>
                         </Form.Item>

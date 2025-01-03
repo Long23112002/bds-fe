@@ -5,6 +5,7 @@ import { Slider, Radio, Button, Space, Card } from 'antd'
 import type { RadioChangeEvent } from 'antd'
 import { searchStore } from '../../../stores/SearchStore'
 import { observer } from 'mobx-react-lite'
+import { pageFilterStore } from '../../../stores/PageFilterStore'
 
 const formatter = (value: number) => `${value} m²`
 
@@ -76,10 +77,26 @@ const AreaFilter = () => {
     }
 
     const handleApply = () => {
+
+        const selectedLabel = areaRanges.find(range => range.value === selectedRange)?.label || 'Tất cả diện tích';
+
         searchStore.setAreaSearchValue({
             min: sliderValue[0],
             max: sliderValue[1]
         })
+
+        pageFilterStore.setParamSearch({
+            ...pageFilterStore.paramSearch,
+            minArea: sliderValue[0],
+            maxArea: sliderValue[1]
+        })
+
+        pageFilterStore.setValueSearch({
+            ...pageFilterStore.valueSearchLabel,
+            arena: selectedLabel
+        })
+
+
         searchStore.setIsOpenArenaFilter(false)
     }
 
@@ -101,9 +118,9 @@ const AreaFilter = () => {
                     max={500}
                     value={sliderValue}
                     onChange={(value) => setSliderValue(value as [number, number])}
-                    // tooltip={{
-                    //     formatter
-                    // }}
+                // tooltip={{
+                //     formatter
+                // }}
                 />
             </div>
 

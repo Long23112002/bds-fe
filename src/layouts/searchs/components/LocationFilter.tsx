@@ -1,77 +1,82 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-refresh/only-export-components */
 import { useEffect, useRef, useState } from "react";
 import { Modal, Input, List } from "antd";
 import { searchStore } from "../../../stores/SearchStore";
 import { observer } from "mobx-react-lite";
+import { locationStore } from "../../../stores/LocationStore";
+import { pageFilterStore } from "../../../stores/PageFilterStore";
 
 interface Location {
     id: string;
     label: string;
     selected?: string;
+    code?: string;
 }
 
-const provinces = [
-    { id: "1", name: "Tỉnh 1" },
-    { id: "2", name: "Tỉnh 2" },
-    { id: "3", name: "Tỉnh 3" },
-];
-const districts = [
-    { id: "1", name: "Quận 1" },
-    { id: "2", name: "Quận 2" },
-    { id: "3", name: "Quận 3" },
-];
-
-const wards = [
-    { id: "1", name: "Phường 1" },
-    { id: "2", name: "Phường 2" },
-    { id: "3", name: "Phường 3" },
-];
-
-const streets = [
-    { id: "1", name: "Đường 1" },
-    { id: "2", name: "Đường 2" },
-    { id: "3", name: "Đường 3" },
-];
-
-const projects = [
-    { id: "1", name: "Dự án 1" },
-    { id: "2", name: "Dự án 2" },
-    { id: "3", name: "Dự án 3" },
-];
 
 const LocationFilter = () => {
     const [locations, setLocations] = useState<Location[]>([
         { id: "province", label: "Tỉnh/Thành" },
         { id: "district", label: "Quận/Huyện" },
         { id: "ward", label: "Phường/Xã" },
-        { id: "street", label: "Đường/Phố" },
-        { id: "project", label: "Dự án" },
     ]);
     const [activeModal, setActiveModal] = useState<string | null>(null);
     const [searchValue, setSearchValue] = useState("");
 
-    const handleLocationSelect = (id: string, name: string) => {
-        setLocations(
-            locations?.map((location) =>
-                location?.id === activeModal ? { ...location, selected: name } : location
-            )
+    const handleLocationSelect = (code: string, name: string) => {
+        setLocations((prevLocations) =>
+            prevLocations.map((location) => {
+                if (location.id === activeModal) {
+                    return { ...location, selected: name, code };
+                }
+                if (activeModal === "province" && location.id === "district") {
+                    return { ...location, selected: undefined, code: undefined };
+                }
+                if ((activeModal === "province" || activeModal === "district") && location.id === "ward") {
+                    return { ...location, selected: undefined, code: undefined };
+                }
+                return location;
+            })
         );
+
+        if (activeModal === "province") {
+            locationStore.fetchDistricts(code);
+        } else if (activeModal === "district") {
+            locationStore.fetchWards(code);
+        }
+
         setActiveModal(null);
     };
 
     const handleReset = () => {
-        setLocations(locations.map((location) => ({ ...location, selected: undefined })));
+        setLocations(locations.map((location) => ({ ...location, selected: undefined, code: undefined })));
     };
 
     const handleApply = () => {
-        const selectedLocations = locations.reduce((acc, loc) => {
-            acc[loc.id] = loc.selected || "";
-            return acc;
-        }, {} as Record<string, string>);
-        searchStore.setSearchLocation(selectedLocations);
+        const selectedLocations = locations
+            .filter(loc => loc.selected)
+            .reduce((acc, loc) => {
+                acc[loc.id] = loc.code as string; // Lưu mã code
+                acc[`${loc.id}Name`] = loc.selected as string; // Lưu tên địa điểm
+                return acc;
+            }, {} as Record<string, string>);
+
+        pageFilterStore.setParamSearch({
+            ...pageFilterStore.paramSearch,
+            wardCode: selectedLocations.ward,
+            districtCode: selectedLocations.district,
+            provinceCode: selectedLocations.province,
+        });
+
+        // Ưu tiên hiển thị tên xã, quận, hoặc tỉnh
+        pageFilterStore.setValueSearch({
+            ...pageFilterStore.valueSearchLabel,
+            location: selectedLocations.wardName || selectedLocations.districtName || selectedLocations.provinceName,
+        });
+
         searchStore.setIsLocaltionFilterModal(false);
     };
-
     const listRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -82,12 +87,16 @@ const LocationFilter = () => {
                 }
             }
         };
-    
+
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [activeModal]);
+
+    useEffect(() => {
+        locationStore.fetchProvinces();
+    }, []);
 
     return (
         <>
@@ -99,7 +108,7 @@ const LocationFilter = () => {
                 left: "16px",
             }}>
                 <div className="mb-4">
-                    <h2 className="h5 mb-4">Khu vực & Dự án</h2>
+                    <h2 className="h5 mb-4">Khu vực</h2>
                     <div className="mb-3">
                         {locations.map((item) => (
                             <button
@@ -107,6 +116,10 @@ const LocationFilter = () => {
                                 className="btn btn-outline-secondary d-flex justify-content-between align-items-center w-100 mb-2"
                                 style={{ height: "56px" }}
                                 onClick={() => setActiveModal(item.id)}
+                                disabled={
+                                    (item.id === "district" && !locations.find(loc => loc.id === "province")?.selected) ||
+                                    (item.id === "ward" && !locations.find(loc => loc.id === "district")?.selected)
+                                }
                             >
                                 <span>{item.selected || item.label}</span>
                                 <i className="bi bi-chevron-right text-muted"></i>
@@ -136,6 +149,7 @@ const LocationFilter = () => {
                 open={!!activeModal}
                 onCancel={() => setActiveModal(null)}
                 footer={null}
+                style={{ maxWidth: "500px" }} // Optional: Adjust modal width as needed
             >
                 <Input
                     placeholder={`Tìm ${locations.find((loc) => loc.id === activeModal)?.label}`}
@@ -143,35 +157,34 @@ const LocationFilter = () => {
                     onChange={(e) => setSearchValue(e.target.value)}
                     className="mb-3"
                 />
-                <List
-                    dataSource={
-                        (activeModal === "province"
-                            ? provinces
-                            : activeModal === "district"
-                                ? districts
-                                : activeModal === "ward"
-                                    ? wards
-                                    : activeModal === "street"
-                                        ? streets
-                                        : activeModal === "project"
-                                            ? projects
-                                            : []
-                        ).filter((item: { id: string; name: string }) =>
-                            item.name.toLowerCase().includes(searchValue.toLowerCase())
-                        )
-                    }
-                    renderItem={(item) => (
-                        <List.Item
-                            onClick={() => handleLocationSelect(item.id, item.name)}
-                            className="d-flex justify-content-between align-items-center"
-                            style={{ cursor: "pointer", padding: "12px 16px" }}
-                        >
-                            <span>{item.name}</span>
-                            <i className="bi bi-chevron-right"></i>
-                        </List.Item>
-                    )}
-                />
+                <div style={{ maxHeight: "300px", overflowY: "auto" }}> {/* Add scroll here */}
+                    <List
+                        dataSource={
+                            (activeModal === "province"
+                                ? locationStore.provinces
+                                : activeModal === "district"
+                                    ? locationStore.districts
+                                    : activeModal === "ward"
+                                        ? locationStore.wards
+                                        : []
+                            ).filter((item: { code: string; fullName: string }) =>
+                                item.fullName.toLowerCase().includes(searchValue.toLowerCase())
+                            )
+                        }
+                        renderItem={(item: any) => (
+                            <List.Item
+                                onClick={() => handleLocationSelect(item.code, item.fullName)}
+                                className="d-flex justify-content-between align-items-center"
+                                style={{ cursor: "pointer", padding: "12px 16px" }}
+                            >
+                                <span>{item.fullName}</span>
+                                <i className="bi bi-chevron-right"></i>
+                            </List.Item>
+                        )}
+                    />
+                </div>
             </Modal>
+
         </>
     );
 }

@@ -1,0 +1,126 @@
+/* Custom styles to complement Bootstrap and Ant Design */
+.search-button {
+  margin: -6px -7px;
+}
+
+.property-card {
+  transition: box-shadow 0.3s ease;
+}
+
+.property-card:hover {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.listing-filters .ant-switch {
+  background-color: #d9d9d9;
+}
+
+.listing-filters .ant-switch-checked {
+  background-color: #1890ff;
+}
+
+/* Override some Bootstrap defaults */
+.btn-primary {
+  background-color: #d32f2f;
+  border-color: #d32f2f;
+}
+
+.btn-primary:hover {
+  background-color: #b71c1c;
+  border-color: #b71c1c;
+}
+
+.text-primary {
+  color: #d32f2f !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .listing-filters {
+    flex-direction: column;
+  }
+
+  .property-card .img-fluid {
+    height: 200px !important;
+  }
+}
+
+.main-image-container {
+  height: 400px;
+  overflow: hidden;
+}
+
+.thumbnail {
+  height: 200px;
+  object-fit: cover;
+}
+
+.more-photos {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.property-card .card-body {
+  padding: 1.5rem;
+}
+
+.property-card .card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.bi {
+  font-size: 1.1rem;
+  vertical-align: -2px;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 80px;
+  z-index: 1000;
+  background-color: white;
+  border-top: 1px solid #F2F2F2;
+  box-shadow: 0px 4px 10px rgba(182, 182, 182, 0.18) !important;
+  padding: 20px 15px;
+  width: 100%;
+}
+
+.search-input {
+  flex-grow: 1;
+  /* Cho phép input chiếm nhiều không gian */
+  max-width: 500px;
+  /* Giới hạn chiều rộng tối đa */
+}
+
+@media (max-width: 768px) {
+  .sticky-header .d-flex {
+    flex-wrap: wrap;
+    /* Cho phép các phần tử xuống dòng */
+    justify-content: center;
+    /* Canh giữa */
+    gap: 10px;
+    /* Khoảng cách giữa các phần tử */
+  }
+
+  .search-input {
+    width: 100%;
+    /* Input chiếm toàn bộ chiều rộng */
+  }
+
+  .dropdown-filters {
+    flex-wrap: wrap;
+    /* Chuyển các dropdown thành 2 hàng */
+    gap: 10px;
+  }
+}

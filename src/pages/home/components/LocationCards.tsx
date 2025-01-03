@@ -1,49 +1,42 @@
 import { Skeleton } from 'antd';
 import '../styles/location-card.css';
 import { useState, useEffect } from 'react';
+import { pageFilterStore } from '../../../stores/PageFilterStore';
+import { useNavigate } from 'react-router-dom';
 
 interface LocationData {
     name: string;
     listings: number;
     image: string;
+    code?: string;
 }
 
-const locations: LocationData[] = [
-    {
-        name: 'TP. Hồ Chí Minh',
-        listings: 65712,
-        image: 'https://file4.batdongsan.com.vn/images/newhome/cities1/HCM-web-1.jpg?height=400&width=800',
-    },
-    {
-        name: 'Hà Nội',
-        listings: 61974,
-        image: 'https://file4.batdongsan.com.vn/images/newhome/cities1/HN-web-3.jpg?height=300&width=400',
-    },
-    {
-        name: 'Đà Nẵng',
-        listings: 9212,
-        image: 'https://file4.batdongsan.com.vn/images/newhome/cities1/DDN-web-1.jpg?height=300&width=400',
-    },
-    {
-        name: 'Bình Dương',
-        listings: 7386,
-        image: 'https://file4.batdongsan.com.vn/images/newhome/cities1/BD-web-2.jpg?height=300&width=400',
-    },
-    {
-        name: 'Đồng Nai',
-        listings: 3868,
-        image: 'https://file4.batdongsan.com.vn/images/newhome/cities1/DDN-web-2.jpg?height=300&width=400',
-    },
-];
+const locations: LocationData[] = [{ name: 'TP. Hồ Chí Minh', listings: 65712, code: '79', image: 'https://file4.batdongsan.com.vn/images/newhome/cities1/HCM-web-1.jpg?height=400&width=800', }, { name: 'Hà Nội', listings: 61974, code: '01', image: 'https://file4.batdongsan.com.vn/images/newhome/cities1/HN-web-3.jpg?height=300&width=400', }, { name: 'Đà Nẵng', listings: 9212, code: '48', image: 'https://file4.batdongsan.com.vn/images/newhome/cities1/DDN-web-1.jpg?height=300&width=400', }, { name: 'Bình Dương', listings: 7386, code: '74', image: 'https://file4.batdongsan.com.vn/images/newhome/cities1/BD-web-2.jpg?height=300&width=400', }, { name: 'Đồng Nai', listings: 3868, code: '75', image: 'https://file4.batdongsan.com.vn/images/newhome/cities1/DDN-web-2.jpg?height=300&width=400', },];
 
 export default function LocationCards() {
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         setTimeout(() => {
             setLoading(false);
         }, 2000);
     }, []);
+
+    const handleLocationClick = (name: string, code: string) => {
+      
+        pageFilterStore.setParamSearch({
+            ...pageFilterStore.paramSearch,
+            provinceCode: code,
+        })
+
+        pageFilterStore.setValueSearch({
+            ...pageFilterStore.valueSearchLabel,
+            location: name,
+        })
+        navigate('/filter-page')
+    };
 
     if (loading) {
         return (
@@ -75,7 +68,10 @@ export default function LocationCards() {
             <div className="row g-4">
                 {/* Cột 1: TP. Hồ Chí Minh */}
                 <div className="col-lg-6 col-md-12">
-                    <div className="card w-100 cursor-pointer shadow-sm">
+                    <div
+                        className="card w-100 cursor-pointer shadow-sm"
+                        onClick={() => handleLocationClick(locations[0].name, locations[0].code || '')}
+                    >
                         <div className="position-relative" style={{ height: '100%' }}>
                             <img
                                 src={locations[0].image}
@@ -102,7 +98,10 @@ export default function LocationCards() {
                     <div className="row g-4">
                         {locations.slice(1).map((location, index) => (
                             <div key={index} className="col-lg-6 col-md-6 col-sm-12">
-                                <div className="card w-100 cursor-pointer shadow-sm">
+                                <div
+                                    className="card w-100 cursor-pointer shadow-sm"
+                                    onClick={() => handleLocationClick(location.name, location.code || '')}
+                                >
                                     <div className="position-relative" style={{ height: '200px' }}>
                                         <img
                                             src={location.image}

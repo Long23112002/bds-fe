@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { makeAutoObservable } from "mobx";
+import { PostRequest } from "../api/posts";
 
 class NewPostStore {
     province: string | null = null;
@@ -9,12 +11,37 @@ class NewPostStore {
 
     isOpenModalAddress = false;
 
+    currentStep = 0;
+
     isOpenModalLocations = false;
 
+    valueNewPost: PostRequest = {} as PostRequest;
 
+
+    stressTotal: {
+        district: string | null;
+        province: string | null;
+        street: string | null;
+        streetName: string | null;
+        urlmap: string | null;
+        ward: string | null;
+    } | null = null;
 
     constructor() {
         makeAutoObservable(this);
+    }
+
+
+    setValueNewPost(value: PostRequest) {
+        this.valueNewPost = value;
+    }
+
+    setStressTotal(value: any) {
+        this.stressTotal = value;
+    }
+
+    setCurrentStep(value: number) {
+        this.currentStep = value;
     }
 
 
@@ -22,28 +49,23 @@ class NewPostStore {
         this.province = value;
         this.district = null;
         this.ward = null;
-        this.updateDisplayAddress();
     }
 
     setDistrict(value: string | null) {
         this.district = value;
         this.ward = null;
-        this.updateDisplayAddress();
     }
 
     setWard(value: string | null) {
         this.ward = value;
-        this.updateDisplayAddress();
     }
 
     setStreet(value: string | null) {
         this.street = value;
-        this.updateDisplayAddress();
     }
 
     setProject(value: string | null) {
         this.project = value;
-        this.updateDisplayAddress();
     }
 
     setIsOpenModalAddress(value: boolean) {
@@ -52,16 +74,6 @@ class NewPostStore {
 
     setIsOpenModalLocations(value: boolean) {
         this.isOpenModalLocations = value;
-    }
-
-
-    reset() {
-        this.province = null;
-        this.district = null;
-        this.ward = null;
-        this.street = null;
-        this.project = null;
-        
     }
 
 
@@ -76,11 +88,8 @@ class NewPostStore {
         return parts.filter((part) => part).join(", ");
     }
 
-
-    private updateDisplayAddress() {
-
-    }
 }
 
-// Khởi tạo store
+
 export const newPostStore = new NewPostStore();
+

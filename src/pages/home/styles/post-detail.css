@@ -1,0 +1,39 @@
+.property-carousel .slick-slider {
+  background: #f0f0f0;
+}
+
+.property-carousel .slick-prev,
+.property-carousel .slick-next {
+  color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.property-carousel .slick-prev {
+  left: 40px;
+}
+
+.property-carousel .slick-next {
+  right: 20px;
+}
+
+
+.slick-dots li.slick-active button:before {
+    display: none;
+}
+
+.slick-dots li button:before{
+    display: none;
+}
+
+.property-slider .ant-carousel .slick-prev,
+.property-slider .ant-carousel .slick-next {
+  z-index: 2;
+}
+
+

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-refresh/only-export-components */
 
 
@@ -5,6 +6,7 @@ import { observer } from "mobx-react-lite";
 import { useState, useEffect, useRef } from "react";
 import { searchStore } from "../../../stores/SearchStore";
 import '../styles/search.css';
+import { pageFilterStore } from "../../../stores/PageFilterStore";
 
 interface ListItem {
     id: string;
@@ -14,16 +16,7 @@ interface ListItem {
 }
 
 const CheckBoxList = () => {
-    const [data, setData] = useState<ListItem[]>([
-        { id: '1', value: 'Tất cả nhà đất', isChecked: false, icon: 'fa-house' },
-        { id: '2', value: 'Căn hộ chung cư', isChecked: false, icon: 'fa-building' },
-        { id: '3', value: 'Chung cư mini, căn hộ dịch vụ', isChecked: false, icon: 'fa-building-user' },
-        { id: '4', value: 'Các loại nhà bán', isChecked: false, icon: 'fa-home' },
-        { id: '5', value: 'Nhà riêng', isChecked: false, icon: 'fa-house-user' },
-        { id: '6', value: 'Nhà biệt thự, liền kề', isChecked: false, icon: 'fa-house-flag' },
-        { id: '7', value: 'Nhà mặt phố', isChecked: false, icon: 'fa-store' },
-        { id: '8', value: 'Shophouse, nhà phố thương mại', isChecked: false, icon: 'fa-shop' },
-    ]);
+    const [data, setData] = useState<ListItem[]>([]);
 
     const listRef = useRef<HTMLDivElement>(null);
 
@@ -40,28 +33,54 @@ const CheckBoxList = () => {
         };
     }, []);
 
-    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newData = data.map(item => ({
-            ...item,
-            isChecked: e.target.checked,
+    useEffect(() => {
+        const mappedOptions = pageFilterStore.residentialOptions.map((item: any) => ({
+            id: item.id,
+            value: item.name,
+            isChecked: false,
+            icon: 'fa-house',
         }));
-        setData(newData);
+        setData(mappedOptions);
+    }, [pageFilterStore.residentialOptions]);
+
+    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const isChecked = e.target.checked;
+        setData(prevData => prevData.map(item => ({ ...item, isChecked })));
     };
 
     const handleCheckboxChange = (id: string) => {
-        const newData = data.map(item =>
-            item.id === id ? { ...item, isChecked: !item.isChecked } : item
+        setData(prevData =>
+            prevData.map(item =>
+                item.id === id ? { ...item, isChecked: !item.isChecked } : item
+            )
         );
-        setData(newData);
     };
 
     const handleReset = () => {
-        const newData = data.map(item => ({
-            ...item,
-            isChecked: false,
-        }));
-        setData(newData);
+        setData(prevData => prevData.map(item => ({ ...item, isChecked: false })));
     };
+
+    const getSelectedItems = () => {
+        return data.filter(item => item.isChecked).map(item => ({ id: item.id, value: item.value }));
+    };
+
+    const handleApply = () => {
+        const selectedItems = getSelectedItems();
+        pageFilterStore.setParamSearch({
+            ...pageFilterStore.paramSearch,
+            residentialPropertyIds: new Set(selectedItems.map(item => parseInt(item.id))),
+        })
+
+
+        searchStore.setIsOpenMenuButton(false);
+    };
+
+    useEffect(() => {
+        pageFilterStore.fetchResidentials(
+            { name: '' },
+            { page: 0, size: 10000 }
+        );
+    }, []);
 
     return (
         <div ref={listRef} className={`list-group ${searchStore.isOpenMenuButton ? 'open' : ''}`}>
@@ -80,10 +99,9 @@ const CheckBoxList = () => {
                     />
                 </label>
 
-                {data.map((item) => (
+                {data.map(item => (
                     <label key={item.id} className="list-group-item border-bottom">
                         <div className="d-flex align-items-center">
-                            <i className={`fas ${item.icon} me-2`}></i>
                             <span>{item.value}</span>
                         </div>
                         <input
@@ -100,7 +118,9 @@ const CheckBoxList = () => {
                 <button className="btn btn-outline-white" onClick={handleReset}>
                     <i className="fa-solid fa-arrows-rotate"></i> <span>Đặt lại</span>
                 </button>
-                <button className="btn btn-danger">Áp dụng</button>
+                <button className="btn btn-danger" onClick={handleApply}>
+                    Áp dụng
+                </button>
             </div>
         </div>
     );

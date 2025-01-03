@@ -1,11 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Slider, Radio, Button, Space, Card } from 'antd'
 import type { RadioChangeEvent } from 'antd'
 import { searchStore } from '../../../stores/SearchStore'
 import { observer } from 'mobx-react-lite'
+import { pageFilterStore } from '../../../stores/PageFilterStore'
 
 const formatter = (value: number) => value.toLocaleString('vi-VN')
 
@@ -21,7 +22,7 @@ const priceRanges = [
   { label: '5 - 7 tỷ', value: '5000-7000' },
 ]
 
-const PriceFilter = () =>  {
+const PriceFilter = () => {
   const [sliderValue, setSliderValue] = useState<[number, number]>([0, 60000])
   const [selectedRange, setSelectedRange] = useState('all')
 
@@ -62,33 +63,44 @@ const PriceFilter = () =>  {
   }
 
   const handleApply = () => {
-    searchStore.setPriceSearchValue({
-      min: sliderValue[0],
-      max: sliderValue[1]
-    })
-    searchStore.setIsModalPeiceFilter(false)
-    console.log(searchStore.priceSearchValue)
-  }
+    const selectedLabel = priceRanges.find(range => range.value === selectedRange)?.label || 'Tất cả mức giá';
 
-  const listRef = useRef<HTMLDivElement>(null);
+    pageFilterStore.setParamSearch({
+      ...pageFilterStore.paramSearch,
+      maxPrice: sliderValue[1] * 1000000,
+      minPrice: sliderValue[0] * 1000000,
+    });
+
+    pageFilterStore.setValueSearch({
+      ...pageFilterStore.valueSearchLabel,
+      price: selectedLabel
+    })
+
+    searchStore.setIsModalPeiceFilter(false);
+  };
+
+  const listRef = React.createRef<HTMLDivElement>();
+
 
   useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-          if (listRef.current && !listRef.current.contains(event.target as Node)) {
-              searchStore.setIsModalPeiceFilter(false);
-          }
-      };
+    const handleClickOutside = (event: MouseEvent) => {
+      if (listRef.current && !listRef.current.contains(event.target as Node)) {
+        searchStore.setIsModalPeiceFilter(false);
+      }
+    };
 
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-          document.removeEventListener('mousedown', handleClickOutside);
-      };
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [listRef]);
 
 
-  
+
+
+
   return (
-    <Card  ref={listRef} style={{
+    <Card ref={listRef}  style={{
       display: searchStore.isModalPeiceFilter ? 'block' : 'none',
       width: "340px", height: '460px', overflow: 'auto',
       position: 'absolute', top: 160, left: 250,
@@ -106,9 +118,6 @@ const PriceFilter = () =>  {
           max={60000}
           value={sliderValue}
           onChange={(value) => setSliderValue(value as [number, number])}
-          // tooltip={{
-          //   formatter
-          // }}
         />
       </div>
 
@@ -135,7 +144,7 @@ const PriceFilter = () =>  {
           type="primary"
           onClick={handleApply}
           style={{ backgroundColor: '#f5222d', borderColor: '#f5222d' }}
-        > 
+        >
           Áp dụng
         </Button>
       </div>

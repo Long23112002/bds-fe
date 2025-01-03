@@ -1,12 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-refresh/only-export-components */
-'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
 import { Button, Card, Checkbox, Space } from 'antd'
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
-// import { Global, css } from '@emotion/react'
 import { searchStore } from '../../../stores/SearchStore'
 import { observer } from 'mobx-react-lite'
+import { pageFilterStore } from '../../../stores/PageFilterStore'
 
 interface FilterOption {
     label: string
@@ -21,21 +21,16 @@ const bedroomOptions: FilterOption[] = [
     { label: '5+', value: '5+' },
 ]
 
-const directionOptions: FilterOption[] = [
-    { label: 'Đông', value: 'dong' },
-    { label: 'Tây', value: 'tay' },
-    { label: 'Nam', value: 'nam' },
-    { label: 'Bắc', value: 'bac' },
-    { label: 'Đông - Bắc', value: 'dong-bac' },
-    { label: 'Tây - Bắc', value: 'tay-bac' },
-    { label: 'Tây - Nam', value: 'tay-nam' },
-    { label: 'Đông - Nam', value: 'dong-nam' },
-]
+const directionOptions: any[] = pageFilterStore.diractionOptions.map((item: any) => {
+    return {
+        label: item.name,
+        value: item.id,
+    }
+})
 
 const contentOptions: FilterOption[] = [
     { label: 'Hình ảnh', value: 'image' },
     { label: 'Video', value: 'video' },
-    { label: '3D & 360°', value: '3d-360' },
 ]
 
 const MultiSelectFilter = () => {
@@ -81,6 +76,10 @@ const MultiSelectFilter = () => {
             directions: [],
             content: [],
         })
+
+        setSelectedBedrooms([])
+        setSelectedDirections([])
+        setSelectedContent([])
     }
 
     const handleApply = () => {
@@ -88,7 +87,7 @@ const MultiSelectFilter = () => {
         const directionsValue = selectedDirections;
         const contentValue = selectedContent;
 
-
+        // Lấy các giá trị tiếng Việt tương ứng từ các lựa chọn
         const bedroomsVietnamese = selectedBedrooms.map(
             value => bedroomOptions.find(option => option.value === value)?.label || value
         );
@@ -99,8 +98,8 @@ const MultiSelectFilter = () => {
             value => contentOptions.find(option => option.value === value)?.label || value
         );
 
-
-        searchStore.setFilterOptionValue({
+        // Cập nhật các giá trị đã chọn vào pageFilterStore
+        pageFilterStore.setFilterOptionValue({
             bedroom: bedroomsValue,
             bedroomVietnamese: bedroomsVietnamese,
             directions: directionsValue,
@@ -109,7 +108,18 @@ const MultiSelectFilter = () => {
             contentVietnamese: contentVietnamese,
         });
 
-        console.log(searchStore.filterOptionValue.directionsVietnamese)
+        pageFilterStore.setValueSearch({
+            ...pageFilterStore.valueSearchLabel,
+            checkboxQuantity: selectedBedrooms.length + selectedDirections.length + selectedContent.length,
+        })
+
+        pageFilterStore.setParamSearch({
+            ...pageFilterStore.paramSearch,
+            numBerOfBedrooms: new Set<number>(bedroomsValue.map(value => parseInt(value))),
+            media: new Set<string>(contentValue),
+        })
+
+        searchStore.setIsfilterOption(false);
     };
 
 
@@ -127,6 +137,13 @@ const MultiSelectFilter = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
+    useEffect(() => {
+        pageFilterStore.fetchHouseDirection({ name: '' }, {
+            page: 0,
+            size: 1000
+        })
+    }, [])
 
     return (
         <>
@@ -167,6 +184,7 @@ const MultiSelectFilter = () => {
                         icon={<span style={{ marginRight: 8 }}>↺</span>}
                         onClick={handleReset}
                     >
+
                         Đặt lại
                     </Button>
                     <Button
