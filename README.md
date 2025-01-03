@@ -26,8 +26,8 @@ Phần backend không được bao gồm trong README này, tuy nhiên, bạn c�
 ## Cài Đặt
 1. Clone repository:
    ```bash
-   git clone https://github.com/your-repo/real-estate.git
-   cd real-estate
+   git clone https://github.com/Long23112002/bds-fe
+   cd bds-fe
    ```
 
 2. Cài đặt dependencies:
