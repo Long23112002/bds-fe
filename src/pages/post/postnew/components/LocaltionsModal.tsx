@@ -4,8 +4,9 @@ import React, { useEffect, useState } from "react";
 import { Modal, Select, Button, Form, Input } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
-import { newPostStore } from "../../../stores/NewPostStore";
-import { locationStore } from "../../../stores/LocationStore";
+import { locationStore } from "../../../../stores/LocationStore";
+import { newPostStore } from "../../../../stores/NewPostStore";
+
 
 const LocationSelectModal: React.FC = () => {
     const [form] = Form.useForm();

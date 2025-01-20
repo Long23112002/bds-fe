@@ -11,10 +11,10 @@ import {
     GeoAlt,
     Images,
 } from 'react-bootstrap-icons'
-import "../styles/PropertyPreviewModal.css"
-import { formPostNew } from '../../../stores/FormPostNew'
+import '../styles/PropertyPreviewModal.css'
+import { formPostNew } from '../../../../stores/FormPostNew'
 import { observer } from 'mobx-react-lite'
-import { newPostStore } from '../../../stores/NewPostStore'
+import { newPostStore } from '../../../../stores/NewPostStore'
 import { Bell } from 'lucide-react'
 
 const formatPrice = (price: number | string) => {
@@ -41,7 +41,7 @@ const userInfor = {
 }
 
 
-const PropertyPreviewModal = () => {
+const PropertyPreviewModalUpdate = () => {
     const [currentImage, setCurrentImage] = useState(0)
 
     const { valueNewPost, stressTotal } = newPostStore
@@ -247,4 +247,4 @@ const PropertyPreviewModal = () => {
     )
 }
 
-export default observer(PropertyPreviewModal)
+export default observer(PropertyPreviewModalUpdate)

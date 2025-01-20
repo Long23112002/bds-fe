@@ -20,7 +20,6 @@ import {
 } from '@ant-design/icons'
 import { useAuth } from '../../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 import Cokie from 'js-cookie';
 
 export default function SidebarUser() {
@@ -28,20 +27,16 @@ export default function SidebarUser() {
     const { authData } = useAuth();
 
     const wallet = Cokie.get('wallet');
-
-    useEffect (() => {
-        console.log(authData)
-    }, [authData]);
+    const id = localStorage.getItem('id');
 
     const navigator = useNavigate();
 
     return (
-        <div className="d-flex flex-column vh-100 bg-white shadow-sm p-3" style={{ width: '280px', overflowY: 'auto' }}>
+        <div className="d-flex flex-column vh-100 bg-white shadow-sm p-3" style={{ width: '300px', overflowY: 'auto' }}>
             {/* User Profile */}
             <div className="text-center mb-4 pb-3 border-bottom">
                 <Avatar src={authData?.avatar} size={64} icon={<UserOutlined />} className="mb-2" />
                 <h3 className="fw-medium">{authData?.fullName}</h3>
-                {/* <p className="text-muted small">0 điểm</p> */}
             </div>
 
             {/* Account Balance */}
@@ -49,17 +44,19 @@ export default function SidebarUser() {
                 <h4 className="text-muted mb-2">Số dư tài khoản</h4>
                 <div className="d-flex justify-content-between mb-2">
                     <span>TK Chính</span>
-                    <span>{new Intl.NumberFormat().format(Number(wallet) || 0)} VND</span>
-                </div>
-                <div className="d-flex justify-content-between mb-2">
-                    <span>TK Khuyến mãi</span>
-                    <span>0</span>
+                    <span>{new Intl.NumberFormat().format(Number(wallet) || 0)} đ</span>
                 </div>
                 <div className="d-flex justify-content-between align-items-center small">
-                    <span>Mã chuyển khoản</span>
+                    <span>Mã chuyển khoản : </span>
                     <div className="d-flex align-items-center">
-                        <span className="me-2">BDS38734935</span>
-                        <Button className="btn btn-outline-secondary btn-sm p-0 d-flex align-items-center">
+                        <span className="me-2">{`BDS${id}`}</span>
+                        <Button style={{
+                            width: '30px',
+                            height: '30px',
+                            lineHeight: '0',
+                            padding: '0',
+                            borderRadius: '50%'
+                        }} className="btn btn-outline-secondary btn-sm p-0 d-flex align-items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>
                         </Button>
                     </div>
@@ -67,18 +64,20 @@ export default function SidebarUser() {
             </div>
 
             {/* Top Up Button */}
-            <Button className="btn btn-primary w-100 mb-4">Nạp tiền</Button>
+            <Button className="btn btn-primary w-100 mb-4 d-flex justify-content-center align-items-center">
+                Nạp tiền
+            </Button>
 
             {/* Navigation Menu */}
             <Menu
                 mode="inline"
                 defaultSelectedKeys={['1']}
-                defaultOpenKeys={['sub1', 'sub2', 'sub3']}
                 items={[
                     {
                         key: '1',
                         icon: <DashboardOutlined />,
                         label: 'Tổng quan',
+                        onClick: () => navigator('/user-dasboard')
                     },
                     {
                         key: 'sub1',
@@ -90,11 +89,12 @@ export default function SidebarUser() {
                                 icon: <FileTextOutlined />,
                                 label: 'Đăng mới',
                                 onClick: () => navigator('/post-new')
-                            }, 
+                            },
                             {
                                 key: '3',
                                 icon: <FileTextOutlined />,
                                 label: 'Danh sách tin',
+                                onClick: () => navigator('/user-dasboard/post-user-manager')
                             },
                             {
                                 key: '4',

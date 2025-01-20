@@ -2,11 +2,11 @@
 import React from 'react';
 import { Modal, Input, Button } from 'antd';
 import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
-import { newPostStore } from '../../../stores/NewPostStore';
+import { newPostStore } from '../../../../stores/NewPostStore';
 import { observer } from 'mobx-react-lite';
 
 
-const AddressModal: React.FC = () => {
+const AddressModalUpdate: React.FC = () => {
 
     const searchHistory = [
         "Cao ốc văn phòng 16 Liễu Giai, Phố Liễu Giai, Phường Liễu Giai, Quận Ba Đình, Hà Nội"
@@ -20,6 +20,7 @@ const AddressModal: React.FC = () => {
     const onClose = () => {
         newPostStore.setIsOpenModalAddress(false);
     }
+
 
     return (
         <Modal
@@ -86,5 +87,5 @@ const AddressModal: React.FC = () => {
     );
 };
 
-export default observer(AddressModal);
+export default observer(AddressModalUpdate);
 

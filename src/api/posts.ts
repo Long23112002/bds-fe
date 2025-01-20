@@ -3,6 +3,7 @@ import axios from 'axios';
 import { BASE_API } from '../enums/baseApi';
 import Cokie from 'js-cookie';
 import { ObservableSet } from 'mobx';
+import axiosInstance from './AxiosInstance';
 
 export interface PostRequest {
     contactName: string
@@ -74,6 +75,15 @@ export interface PostParam {
     media?: Set<string>;
 }
 
+export const countPostApi = async () => {
+    try {
+        const response = await axiosInstance.get(`${BASE_API}/api/v1/posts/count`);
+        return response.data;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
 
 
 
@@ -142,6 +152,15 @@ export const filterSuggesApi = async () => {
         return Promise.reject(error);
     }
 
+}
+
+export const countProvinceApi = async (demand: string) => {
+    try {
+        const response = await axios.get(`${BASE_API}/api/v1/posts/count_province?demand=${demand}`);
+        return response.data;
+    } catch (error) {
+        return Promise.reject(error);
+    }
 }
 
 

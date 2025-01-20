@@ -3,9 +3,8 @@ import { makeAutoObservable } from "mobx";
 import { filterPostApi, PostParam } from "../api/posts";
 
 class PropertyStore {
+    
     properties:any = [];
-
-
     visibleCount = 8;
     isLoading = false;
 
@@ -16,6 +15,8 @@ class PropertyStore {
     setProperties(properties: any) {
         this.properties = properties
     }
+
+    
 
     async fetchProperties() {
 

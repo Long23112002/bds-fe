@@ -5,6 +5,9 @@ import { authStore } from '../stores/AuthStore';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import UserDropdown from './UserDropdown';
+import Favorite from './favorite/Favorite';
+import NotificationTabs from '../pages/notification/NotificationTab';
+
 
 const Navbar = () => {
 
@@ -66,7 +69,7 @@ const Navbar = () => {
                         </ul>
                         <div className="d-flex" style={{ gap: '20px' }}>
                             {authData ? (
-                                <UserDropdown name={authData.fullName || ''} avatar={authData.avatar || ''}  />
+                                <UserDropdown name={authData.fullName || ''} avatar={authData.avatar || ''} />
                             ) : (
                                 <div className="d-flex" style={{ gap: '20px' }}>
                                     <button className="btn btn-outline-primary btn-text-custom" onClick={handelOpenModalLogin}>Đăng nhập</button>
@@ -74,12 +77,23 @@ const Navbar = () => {
                                 </div>
                             )}
                             <Link to='/post-new'>
-                              <button className="btn btn-outline-white btn-text-custom">Đăng tin</button>
+                                <button className="btn btn-outline-white btn-text-custom">Đăng tin</button>
                             </Link>
                         </div>
                     </div>
+
+
                 </div>
+
+
             </nav>
+            <div style={{ position: 'fixed', zIndex: '99999', top: "70px" }}>
+                <Favorite />
+            </div>
+
+            <div style={{ position: 'fixed', zIndex: '99999', top: "70px" }}>
+                <NotificationTabs />
+            </div>
         </>
     );
 };

@@ -1,18 +1,28 @@
+/* eslint-disable react-refresh/only-export-components */
 
-import { Avatar, Dropdown, Badge } from 'antd'
+import { Avatar, Dropdown, Badge, Tooltip } from 'antd'
 import { BellOutlined, HeartOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import '../layouts/styles/user-dropdown.css'
 import { useAuth } from '../hooks/useAuth'
+import { useNavigate } from 'react-router-dom'
+import { favoriteStore } from '../stores/FavoriteStore'
+import { observer } from 'mobx-react-lite'
+import Cokie from 'js-cookie'
+import { authStore } from '../stores/AuthStore'
+import { notificationStore } from '../stores/NotificationStore'
 
-export default function UserDropdown({ name, avatar }: { name: string, avatar: string }) {
+const UserDropdown = ({ name, avatar }: { name: string, avatar: string }) => {
 
     const { clearAuth } = useAuth();
+
 
     const handleLogout = () => {
         clearAuth();
         window.location.href = '/';
     };
+
+    const navigate = useNavigate();
 
     const items: MenuProps['items'] = [
         {
@@ -23,6 +33,9 @@ export default function UserDropdown({ name, avatar }: { name: string, avatar: s
                     <Badge count="Mới" className="ms-2" />
                 </div>
             ),
+            onClick: () => {
+                navigate('/user-dasboard')
+            }
         },
         {
             key: 'post-management',
@@ -76,12 +89,43 @@ export default function UserDropdown({ name, avatar }: { name: string, avatar: s
         },
     ]
 
+    const handleClickFavorite = () => {
+        const token = Cokie.get('accessToken');
+        if (!token) {
+            authStore.setIsOpenLoginModal(true);
+        }
+        favoriteStore.setIsOpenModalFavorite(!favoriteStore.isOpenModalFavorite);
+    };
+
+    const handleClickNotification = () => {
+        const token = Cokie.get('accessToken');
+        if (!token) {
+            authStore.setIsOpenLoginModal(true);
+        }
+        notificationStore.setIsOpenNotification(!notificationStore.isOpenNotification);
+    }
+
+
     return (
         <div className="d-flex align-items-center gap-3">
-            <HeartOutlined className="fs-5" />
-            <Badge count={1}>
-                <BellOutlined className="fs-5" />
+            <Tooltip title="Danh sách các tin đã lưu" placement='bottom'>
+                <Badge style={{
+                    cursor: 'pointer'
+                }} onClick={handleClickFavorite} count={favoriteStore.listFavorite.length}>
+                    <HeartOutlined style={{
+                        cursor: 'pointer'
+                    }} className="fs-5" />
+                </Badge>
+            </Tooltip>
+
+            <Badge style={{
+                cursor: 'pointer'
+            }} onClick={handleClickNotification} count={notificationStore.countReadFlase}>
+                <BellOutlined style={{
+                    cursor: 'pointer'
+                }} className="fs-5" />
             </Badge>
+
 
             <Dropdown
                 menu={{ items }}
@@ -101,3 +145,4 @@ export default function UserDropdown({ name, avatar }: { name: string, avatar: s
     )
 }
 
+export default observer(UserDropdown);

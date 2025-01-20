@@ -12,11 +12,13 @@ class NewPostStore {
     isOpenModalAddress = false;
 
     currentStep = 0;
+    currentStepUpdate = 0;
 
     isOpenModalLocations = false;
 
     valueNewPost: PostRequest = {} as PostRequest;
-
+    
+    postUpdateDetail: any = {};
 
     stressTotal: {
         district: string | null;
@@ -29,6 +31,18 @@ class NewPostStore {
 
     constructor() {
         makeAutoObservable(this);
+    }
+
+    setCurrentStepUpdate(value: number) {
+        this.currentStepUpdate = value
+    }
+
+    setPostUpdateDetail(value: any) {
+        this.postUpdateDetail = value
+    }
+
+    setFormPostNew(value: any) {
+        this.valueNewPost = value;
     }
 
 

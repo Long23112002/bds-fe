@@ -7,6 +7,7 @@ class LocationStore {
     provinces: any = []
     districts: any = []
     wards: any = []
+    
 
     constructor() {
         makeAutoObservable(this)

@@ -2,16 +2,22 @@
 /* eslint-disable react-refresh/only-export-components */
 
 import React, { useState, useEffect } from 'react';
-import { Card, Badge, Button, Skeleton } from 'antd';
+import { Card, Badge, Button, Skeleton, Tooltip } from 'antd';
 import propertyStore from '../../../stores/PropertyStore';
 import { observer } from 'mobx-react-lite';
 import { differenceInCalendarDays } from 'date-fns';
 import { Link } from 'react-router-dom';
+import { newFavoriteApi } from '../../../api/favorite';
+import { favoriteStore } from '../../../stores/FavoriteStore';
+import { authStore } from '../../../stores/AuthStore';
+import Cokie from 'js-cookie';
 
 const PropertyListing: React.FC = () => {
     const [visibleCount, setVisibleCount] = useState(8);
     const [isExpanded, setIsExpanded] = useState(false);
     const [loading, setLoading] = useState(true);
+
+
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -53,6 +59,25 @@ const PropertyListing: React.FC = () => {
         return priceValue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
     };
 
+    const handleClickAddFavorite = async (e: any, postId: number) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const req = {
+            postId: postId
+        }
+        await newFavoriteApi(req);
+        await favoriteStore.fetchListFavorite();
+    };
+
+
+    const handleClickRemoveFavorite = async (e: any, postId: number) => {
+        e.stopPropagation();
+        e.preventDefault();
+        await favoriteStore.deleteFavorite(postId);
+        await favoriteStore.fetchListFavorite();
+    }
+
+
 
 
     return (
@@ -87,7 +112,11 @@ const PropertyListing: React.FC = () => {
                                         borderRadius: '4px',
                                         boxShadow: '0px 4px 6px 0px rgba(44,44,44,0.04)',
                                         cursor: 'pointer',
-                                        border: '1px solid #F2F2F2'
+                                        border: '1px solid #F2F2F2',
+                                        boxSizing: 'border-box',
+                                    }}
+                                    onClick={() => {
+                                        window.location.href = `/post-detail/${property.id}`;
                                     }}
                                     cover={
                                         <div style={{
@@ -128,7 +157,11 @@ const PropertyListing: React.FC = () => {
                                             fontSize: '0.9rem',
                                             fontWeight: 'bold',
                                             wordWrap: 'break-word',
-                                            whiteSpace: 'normal',
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 2,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
                                             lineHeight: '1.4',
                                         }}
                                     >
@@ -149,20 +182,53 @@ const PropertyListing: React.FC = () => {
                                             Đăng {differenceInCalendarDays(new Date(), property.createdAt) === 0 ? 'Hôm nay' : `${differenceInCalendarDays(new Date(), property.createdAt)} ngày trước`}
                                         </small>
                                         <small style={{ color: '#666' }}>
-                                            <button className="btn" style={{
-                                                background: 'none',
-                                                padding: '0px',
-                                                width: '34px',
-                                                height: '34px',
-                                                border: '1px solid #ccc',
-                                            }}>
-                                                <i className="far fa-heart" style={{ cursor: 'pointer' }}></i>
-                                            </button>
+                                            <Tooltip
+                                                title={
+                                                    favoriteStore.listFavorite.some((fav: any) => fav.post.id === property?.id)
+                                                        ? "Bấm để bỏ lưu tin"
+                                                        : "Bấm để lưu tin"
+                                                }
+                                                placement="bottom"
+                                            >
+                                                <Button
+                                                    onClick={(e) => {
+                                                        const token = Cokie.get('accessToken');
+                                                        if (!token) {
+                                                            authStore.setIsOpenLoginModal(true);
+                                                        }
+
+                                                        const isFavorite = favoriteStore.listFavorite.some(
+                                                            (fav: any) => fav.post.id === property?.id
+                                                        );
+
+                                                        if (isFavorite) {
+                                                            handleClickRemoveFavorite(e, property?.id);
+                                                        } else {
+                                                            handleClickAddFavorite(e, property?.id);
+                                                        }
+                                                    }}
+                                                    className="btn"
+                                                    style={{
+                                                        background: 'none',
+                                                        padding: '0px',
+                                                        width: '34px',
+                                                        height: '34px',
+                                                        border: '1px solid #ccc',
+                                                    }}
+                                                >
+                                                    {favoriteStore.listFavorite.some((fav: any) => fav.post.id === property?.id) ? (
+                                                        <i className="fa-solid fa-heart" style={{ color: '#ff0000' }}></i>
+                                                    ) : (
+                                                        <i className="far fa-heart" style={{ cursor: 'pointer' }}></i>
+                                                    )}
+                                                </Button>
+                                            </Tooltip>
+
                                         </small>
                                     </div>
-
                                 </Card>
                             </Link>
+
                         ))
 
                     )}
