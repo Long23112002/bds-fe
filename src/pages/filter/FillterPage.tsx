@@ -6,7 +6,7 @@ import { Input, Select, Switch, Button, Card, Badge, Row, Typography, Space, Col
 import { SearchOutlined, EnvironmentOutlined, HomeOutlined, BankOutlined, HeartOutlined, UpOutlined, DownOutlined } from '@ant-design/icons'
 
 import '../filter/styles/filter-style.css'
-import { filterPostApi, PostParam } from '../../api/posts'
+import { countProvinceApi, PostParam } from '../../api/posts'
 import { Link } from 'react-router-dom'
 import PageArenaFilter from './components/PageArenaFilter'
 import { pageFilterStore } from '../../stores/PageFilterStore'
@@ -14,8 +14,11 @@ import PagePriceFilter from './components/PagePriceFilter'
 import PageFilterOption from './components/PageFilterOption'
 import PageLocationFilter from './components/PageLocationFilter'
 import PageCheckBoxSearch from './components/PageCheckBoxSearch'
-import { searchStore } from '../../stores/SearchStore'
 import { observer } from 'mobx-react-lite'
+import { favoriteStore } from '../../stores/FavoriteStore'
+import { newFavoriteApi } from '../../api/favorite'
+import Cokie from 'js-cookie'
+import { authStore } from '../../stores/AuthStore'
 
 const { Option } = Select
 const { Title, Text } = Typography;
@@ -30,6 +33,7 @@ const FillterPage = () => {
 
     const [selectedPriceRange, setSelectedPriceRange] = useState<{ min: number; max: number } | null>(null);
     const [selectedAreaRange, setSelectedAreaRange] = useState<{ min: number; max: number } | null>(null);
+    const [countProvice, setCountProvice] = useState<any>([]);
 
     const priceRanges = selectedType === "sell" ? [
         { label: "Thỏa thuận", min: 0, max: 0 },
@@ -144,6 +148,14 @@ const FillterPage = () => {
         fetchPostFilter();
     }, [currentPage]);
 
+    useEffect(() => {
+        const fetchCountProvince = async () => {
+            const res = await countProvinceApi(selectedType.toUpperCase());
+            setCountProvice(res);
+        };
+        fetchCountProvince();
+    }, [selectedType]);
+
 
 
     const formatPrice = (price: number | string) => {
@@ -182,6 +194,17 @@ const FillterPage = () => {
         })
     }
 
+    const handleProvinceClick = (provinceCode: string, provinceName: string) => {
+        pageFilterStore.setValueSearch({
+            ...pageFilterStore.valueSearchLabel,
+            location: provinceName
+        })
+        pageFilterStore.setParamSearch({
+            ...pageFilterStore.paramSearch,
+            provinceCode: provinceCode
+        })
+    }
+
 
     const handelResetFormSearch = () => {
         pageFilterStore.setParamSearch({
@@ -214,13 +237,34 @@ const FillterPage = () => {
     }
 
     const handleSelectType = (type: 'SELL' | 'RENT') => {
+
         return () => {
+            setSelectedType(type === 'SELL' ? 'sell' : 'rent');
             pageFilterStore.setParamSearch({
                 ...pageFilterStore.paramSearch,
                 demand: type
             });
         };
     };
+
+
+    const handleClickAddFavorite = async (e: any, postId: number) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const req = {
+            postId: postId
+        }
+        await newFavoriteApi(req);
+        await favoriteStore.fetchListFavorite();
+    };
+
+
+    const handleClickRemoveFavorite = async (e: any, postId: number) => {
+        e.stopPropagation();
+        e.preventDefault();
+        await favoriteStore.deleteFavorite(postId);
+        await favoriteStore.fetchListFavorite();
+    }
 
 
 
@@ -374,7 +418,6 @@ const FillterPage = () => {
                                                 }}
                                                 bodyStyle={{ padding: 12 }}
                                             >
-
                                                 <Row gutter={[8, 8]}>
                                                     <Col xs={24} sm={24} md={12}>
                                                         <img
@@ -427,7 +470,6 @@ const FillterPage = () => {
                                                     </Col>
                                                 </Row>
 
-
                                                 <div style={{ padding: '12px 0' }}>
                                                     <Title level={5} style={{ margin: '8px 0' }}>
                                                         {post.title}
@@ -478,10 +520,48 @@ const FillterPage = () => {
                                                         </Space>
 
                                                         <Space>
-                                                            <Button type="primary" style={{ background: '#00897b' }}>
-                                                                {post?.user.phoneNumber}
-                                                            </Button>
-                                                            <Button icon={<HeartOutlined />} />
+                                                            <Tooltip
+                                                                title={
+                                                                    favoriteStore.listFavorite.some((fav: any) => fav.post.id === post?.id)
+                                                                        ? "Bấm để bỏ lưu tin"
+                                                                        : "Bấm để lưu tin"
+                                                                }
+                                                                placement="bottom"
+                                                            >
+                                                                <Button
+                                                                    onClick={(e) => {
+                                                                        const token = Cokie.get('accessToken');
+                                                                        if (!token) {
+                                                                            authStore.setIsOpenLoginModal(true);
+
+                                                                        }
+
+                                                                        const isFavorite = favoriteStore.listFavorite.some(
+                                                                            (fav: any) => fav.post.id === post?.id
+                                                                        );
+
+                                                                        if (isFavorite) {
+                                                                            handleClickRemoveFavorite(e, post?.id);
+                                                                        } else {
+                                                                            handleClickAddFavorite(e, post?.id);
+                                                                        }
+                                                                    }}
+                                                                    className="btn"
+                                                                    style={{
+                                                                        background: 'none',
+                                                                        padding: '0px',
+                                                                        width: '34px',
+                                                                        height: '34px',
+                                                                        border: '1px solid #ccc',
+                                                                    }}
+                                                                >
+                                                                    {favoriteStore.listFavorite.some((fav: any) => fav.post.id === post?.id) ? (
+                                                                        <i className="fa-solid fa-heart" style={{ color: '#ff0000' }}></i>
+                                                                    ) : (
+                                                                        <i className="far fa-heart" style={{ cursor: 'pointer' }}></i>
+                                                                    )}
+                                                                </Button>
+                                                            </Tooltip>
                                                         </Space>
                                                     </Row>
                                                 </div>
@@ -490,6 +570,7 @@ const FillterPage = () => {
                                         </Badge.Ribbon>
                                     </div>
                                 </Link>
+
                             ))
                         ) : (
                             <div style={{ textAlign: 'center', marginTop: '20px' }}>
@@ -557,13 +638,16 @@ const FillterPage = () => {
 
                         </Card>
 
-                        <Card className="mb-3" title="Nhà đất cho thuê" bordered={true}>
+                        <Card className="mb-3" title="Mua bán nhà đất" bordered={true}>
                             <ul className="list-unstyled">
-                                {/* {visibleItems.map((item, index) => (
-                                    <li key={index}>
-                                        <a href="#" className="text-decoration-none">{item}</a>
+                                {countProvice.map((item: any) => (
+                                    <li key={item.code}>
+                                        <a href="#" onClick={(e) => {
+                                            e.preventDefault();
+                                            handleProvinceClick(item.code, item.provinceName);
+                                        }} className="text-decoration-none">{`${item.provinceName}(${item.count})`}</a>
                                     </li>
-                                ))} */}
+                                ))}
                             </ul>
 
                             <Button

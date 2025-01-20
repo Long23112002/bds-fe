@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 
-import React, { useEffect, useRef, useState } from 'react'
+import  { useEffect, useRef, useState } from 'react'
 import { Slider, Radio, Button, Space, Card } from 'antd'
 import type { RadioChangeEvent } from 'antd'
 import { searchStore } from '../../../stores/SearchStore'

@@ -3,20 +3,20 @@
 import React, { useEffect, useState } from 'react';
 import { Steps, Form, Radio, Button, Input, Select, InputNumber } from 'antd';
 import { TagOutlined, KeyOutlined, SearchOutlined, EditOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
-import { newPostStore } from '../../stores/NewPostStore';
 import { observer } from 'mobx-react-lite';
 import AddressModal from './components/AddressModal';
 import LocationSelectModal from '../postnew/components/LocaltionsModal';
-import useCheckLogin from '../../hooks/useCheckLogin';
 import ReactQuill from 'react-quill';
 import { SparklesIcon } from 'lucide-react';
 import 'react-quill/dist/quill.snow.css';
 import ImageUploadStep from './components/ImageUploadStep';
 import SubscriptionSelector from './components/SubscriptionSelector';
-import { formPostNew } from '../../stores/FormPostNew';
-import { PropertiesFilter } from '../../types/PropertiesFilter';
-import { Pageable } from '../../types/Pageable';
 import PropertyPreviewModal from './components/PropertyPreviewModal';
+import useCheckLogin from '../../../hooks/useCheckLogin';
+import { formPostNew } from '../../../stores/FormPostNew';
+import { newPostStore } from '../../../stores/NewPostStore';
+import { PropertiesFilter } from '../../../types/PropertiesFilter';
+import { Pageable } from '../../../types/Pageable';
 
 const PostNew = () => {
     const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -659,7 +659,6 @@ const PostNew = () => {
                     )}
 
                     {newPostStore.currentStep === 1 && (
-
                         <ImageUploadStep />
                     )}
 

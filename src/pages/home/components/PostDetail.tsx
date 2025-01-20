@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { Card, Button, Avatar, Tooltip, Carousel } from 'antd';
@@ -8,7 +9,6 @@ import {
   LeftOutlined,
   ShareAltOutlined,
   WarningOutlined,
-  HeartOutlined,
   HomeOutlined,
   CompassOutlined,
   ColumnHeightOutlined,
@@ -21,6 +21,11 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import { authStore } from '../../../stores/AuthStore';
 import { getPostByIdApi } from '../../../api/posts';
+import { Link } from 'react-router-dom';
+import { favoriteStore } from '../../../stores/FavoriteStore';
+import { newFavoriteApi } from '../../../api/favorite';
+import { observer } from 'mobx-react-lite';
+import Cokie from 'js-cookie';
 
 const PostDetail = () => {
 
@@ -129,6 +134,24 @@ const PostDetail = () => {
     return priceValue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
   };
 
+  const handleClickAddFavorite = async (e: any, postId: number) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const req = {
+      postId: postId
+    }
+    await newFavoriteApi(req);
+    await favoriteStore.fetchListFavorite();
+  };
+
+
+  const handleClickRemoveFavorite = async (e: any, postId: number) => {
+    e.stopPropagation();
+    e.preventDefault();
+    await favoriteStore.deleteFavorite(postId);
+    await favoriteStore.fetchListFavorite();
+  }
+
 
 
 
@@ -214,7 +237,7 @@ const PostDetail = () => {
                 )}
               </div>
               <div className="small text-muted">
-                
+
                 {postDetail?.price === 0 && (
                   postDetail?.price && postDetail?.arena ? (
                     postDetail.unit === "VND" ? (
@@ -243,8 +266,46 @@ const PostDetail = () => {
               <Tooltip title="Báo cáo">
                 <Button icon={<WarningOutlined />} />
               </Tooltip>
-              <Tooltip title="Lưu tin">
-                <Button icon={<HeartOutlined />} />
+              <Tooltip
+                title={
+                  favoriteStore.listFavorite.some((fav: any) => fav.post.id === postDetail?.id)
+                    ? "Bấm để bỏ lưu tin"
+                    : "Bấm để lưu tin"
+                }
+                placement="bottom"
+              >
+                <Button
+                  onClick={(e) => {
+                    const token = Cokie.get('accessToken');
+                    if (!token) {
+                      authStore.isOpenLoginModal = true;
+                    }
+
+                    const isFavorite = favoriteStore.listFavorite.some(
+                      (fav: any) => fav.post.id === postDetail?.id
+                    );
+
+                    if (isFavorite) {
+                      handleClickRemoveFavorite(e, postDetail?.id || 0);
+                    } else {
+                      handleClickAddFavorite(e, postDetail?.id || 0);
+                    }
+                  }}
+                  className="btn"
+                  style={{
+                    background: 'none',
+                    padding: '0px',
+                    width: '34px',
+                    height: '34px',
+                    border: '1px solid #ccc',
+                  }}
+                >
+                  {favoriteStore.listFavorite.some((fav: any) => fav.post.id === postDetail?.id) ? (
+                    <i className="fa-solid fa-heart" style={{ color: '#ff0000' }}></i>
+                  ) : (
+                    <i className="far fa-heart" style={{ cursor: 'pointer' }}></i>
+                  )}
+                </Button>
               </Tooltip>
             </div>
           </div>
@@ -384,13 +445,20 @@ const PostDetail = () => {
         {/* Sidebar */}
         <div className="col-lg-4">
           <Card className="mb-4">
-            <div className="d-flex align-items-center mb-3">
-              <Avatar size={64} className="me-3">{postDetail?.user.avatar}</Avatar>
-              <div>
-                <h2 className="h5 mb-1">{postDetail?.user.fullName}</h2>
-                <p className="mb-0 text-muted">Môi giới chuyên nghiệp</p>
+            <Link to={`/profile-user/${postDetail?.user.id}`} style={{
+              textDecoration: 'none',
+              color: '#2C2C2C'
+            }}>
+              <div className="d-flex align-items-center mb-3">
+                <Avatar size={64} className="me-3">{postDetail?.user.avatar}</Avatar>
+
+                <div>
+                  <h2 className="h5 mb-1">{postDetail?.user.fullName}</h2>
+                  <p className="mb-0 text-muted">Môi giới chuyên nghiệp</p>
+                </div>
+
               </div>
-            </div>
+            </Link>
 
             <Button
               type="primary"
@@ -458,5 +526,5 @@ const PostDetail = () => {
   );
 };
 
-export default PostDetail;
+export default observer(PostDetail);
 

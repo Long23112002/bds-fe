@@ -5,10 +5,11 @@ import React, { useEffect, useState } from 'react';
 import { Button, Form, Upload, Input, message } from 'antd';
 import { UploadOutlined, PictureOutlined, RightOutlined, PlusOutlined } from '@ant-design/icons';
 import type { RcFile, UploadFile } from 'antd/es/upload/interface';
-import { newPostStore } from '../../../stores/NewPostStore';
 import { observer } from 'mobx-react-lite';
 import axios from 'axios';
-import { BASE_API } from '../../../enums/baseApi';
+import { BASE_API } from '../../../../enums/baseApi';
+import { newPostStore } from '../../../../stores/NewPostStore';
+
 
 const ImageUploadStep: React.FC = () => {
   const [form] = Form.useForm();
